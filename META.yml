@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Dancer-Template-HtmlTemplate
-version:            0.01
+version:            0.02
 abstract:           HTML::Template wrapper for Dancer
 author:
     - David Precious <davidp@preshweb.co.uk>
@@ -11,7 +11,9 @@ configure_requires:
 build_requires:
     ExtUtils::MakeMaker:  0
 requires:
-    Test::More:  0
+    Dancer:          1.175
+    HTML::Template:  0
+    Test::More:      0
 no_index:
     directory:
         - t
