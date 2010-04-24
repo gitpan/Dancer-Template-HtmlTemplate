@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Dancer-Template-HtmlTemplate
-version:            0.02
+version:            0.03
 abstract:           HTML::Template wrapper for Dancer
 author:
     - David Precious <davidp@preshweb.co.uk>
