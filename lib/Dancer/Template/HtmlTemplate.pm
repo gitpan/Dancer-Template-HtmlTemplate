@@ -7,7 +7,7 @@ use Dancer::FileUtils 'path';
 
 use base 'Dancer::Template::Abstract';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 
 sub init {
@@ -22,6 +22,9 @@ sub render($$$) {
     die "'$template' is not a regular file"
       if !ref($template) && (!-f $template);
 
+    _flatten($tokens)
+      if ref $tokens eq 'HASH';
+
     my $ht = HTML::Template->new(
         filename => $template,
         die_on_bad_params => 0, # Required, as we pass through other params too
@@ -30,6 +33,20 @@ sub render($$$) {
     $ht->param($tokens);
     return $ht->output;
 
+}
+
+sub _flatten {
+    my ($tokens) = @_;
+    my @keys = keys %$tokens;
+    while (@keys) {
+        my $key = shift @keys;
+        ref $tokens->{$key} eq 'HASH'
+          or next;
+        my $value = delete $tokens->{$key};
+        my @new_keys = map "$key.$_", keys %$value;
+        @$tokens{@new_keys} = values %$value;
+        push(@keys, @new_keys);
+    }
 }
 
 1;
@@ -70,6 +87,19 @@ Also, currently template filenames should end with .tt; again, future Dancer
 versions may change this requirement.
 
 
+=head1 Handling nested hashrefs
+
+Since HTML::Template does not allow you to access nested hashrefs (at least,
+not without switching to using  L<HTML::Template::Pluggable> along with
+L<HTML::Template::Plugin::Dot>), this module "flattens" nested hashrefs.
+
+For instance, the session contents are passed to Dancer templates as C<session>
+- to access a key of that hashref named C<username>, you'd say:
+
+    <TMPL_VAR name="session.username">
+
+
+
 =head1 SEE ALSO
 
 L<Dancer>, L<HTML::Template>
@@ -87,6 +117,11 @@ This module is developed on Github at:
 L<http://github.com/bigpresh/Dancer-Template-HtmlTemplate>
  
 Feel free to fork the repo and submit pull requests!
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to Damien Krotkine for providing code to flatten nested hashrefs in a way
+that allows HTML::Template templates to make use of them.
 
 
 =head1 LICENSE
